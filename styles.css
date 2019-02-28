@@ -39,7 +39,8 @@
 }
 
 .box-text, .box-time {
-    color: #66f1bd;
+    /* color: #66f1bd; */
+    color: #4d5a56;
     text-align: center;
     font-size: 2.5em;
 }

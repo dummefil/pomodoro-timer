@@ -21,7 +21,6 @@ $startButton.addEventListener('click', (event) => {
     }
 })
 
-
 function Timer(workTime, restTime) {
 
     this.running = false;
@@ -42,16 +41,22 @@ function Timer(workTime, restTime) {
         this.interval = setInterval(() => {
         
             if (this.currentTime === 0) {
+                
                 if (this.isWorkTime) {
                     this.isWorkTime = false
                     this.currentTime = restTime
                     $workTime.textContent = formatTime(workTime)
+                    sendNotification("READY TO WORK")
                 }
                 else {
                     this.isWorkTime = true
                     this.currentTime = workTime
                     $restTime.textContent = formatTime(restTime)
+                    sendNotification("READY TO REST")
                 }
+                const audio = new Audio('pomodoro.mp3')
+                audio.loop = false
+                audio.play()
             }
 
             this.currentTime -= seconds(1)
@@ -107,6 +112,17 @@ function formatedTimeToNumber (formatedTime) {
     return time
 }
 
-
-
-
+function sendNotification(string) {
+    console.log(Notification.permission)
+    if (Notification.permission === "granted") {
+      new Notification(string);
+    }
+  
+    else if (Notification.permission === "default" || Notification.permission !== 'denied') {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          new Notification(string);
+        }
+      });
+    }
+  }
