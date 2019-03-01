@@ -14,12 +14,13 @@
         <ul>
             <li>More colors!!!</li>
             <li class="done">Usable rest timer!!!</li>
-            <li>Configurable timers</li>
+            <li class="done">Configurable timers</li>
             <li>Onimations</li>
             <li>Styles</li>
             <li class="done">Sound</li>
-            <li>Add working notes</li>
+            <li class="done">Add working notes</li>
             <li class="done">Add 🍅 to title</li>
+            <li class="done">Local notes saving</li>
         </ul>
     </div>
     <div class="boxes-wrapper">
@@ -27,16 +28,30 @@
         <div class="box">
             <div class="box-work">
                 <div class="box-text">Work</div>
-                <div class="box-time">00:10</div>
-            </div>  
+                <div class="box-time-wrapper">
+                    <div class="box-time">25:00</div>
+                    <div class="box-controls">
+                        <div class="box-control-up">🡹</div>
+                        <div class="box-control-down">🡻</div>
+                    </div>
+                </div>
+            </div>
             <div class="box-rest">
                 <div class="box-text">Rest</div>
-                <div class="box-time">00:10</div>
+                <div class="box-time-wrapper">
+                    <div class="box-time">05:00</div>
+                    <div class="box-controls">
+                        <div class="box-control-up">🡹</div>
+                        <div class="box-control-down">🡻</div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="button-wrapper">
+        <div class="buttons-wrapper">
             <button class="start-timer">Start Timer</button>
+            <button class="reset-timer">Reset</button>
         </div>
+        <textarea class="notes">1. This is amazing stuff :)</textarea>
     </div>
 
     <script src="script.js"></script>

@@ -1,39 +1,66 @@
 const $restTime = document.querySelector('.box-rest .box-time')
 const $workTime = document.querySelector('.box-work .box-time')
 const $startButton = document.querySelector('.start-timer')
+const $resetButton = document.querySelector('.reset-timer')
 
-let timerRunnning = false;
+let timer
 
-const workTime = formatedTimeToNumber($workTime.textContent)
-const restTime = formatedTimeToNumber($restTime.textContent)
+let defaultWorkTime
+let defaultRestTime
 
-const timer = new Timer(workTime, restTime)
+const savedWorkTime = localStorage.getItem('default work time') 
+if (savedWorkTime) {
+    defaultWorkTime = formatedTimeToNumber(savedWorkTime)
+} else {
+    defaultWorkTime = formatedTimeToNumber($workTime.textContent) 
+}
+
+const savedRestTime = localStorage.getItem('default rest time') 
+if (savedRestTime) {
+    defaultRestTime = formatedTimeToNumber(savedRestTime)
+} else {
+    defaultRestTime = formatedTimeToNumber($restTime.textContent) 
+}
+
+setDefaults()
 
 $startButton.addEventListener('click', (event) => {
-    event.stopPropagation();
+    const workTime = formatedTimeToNumber($workTime.textContent)
+    const restTime = formatedTimeToNumber($restTime.textContent)
+
+    if (!timer || !timer.running) {
+        timer = new Timer(workTime, restTime)
+    }
+
+    event.stopPropagation()
     if (timer.running) {
-        $startButton.textContent = "Start Timer"
-        timer.stopTimer();
+        $startButton.textContent = 'Start Timer'
+        timer.stopTimer()
     }
     else if (!timer.running) {
-        $startButton.textContent = "Stop Timer"
-        timer.startTimer();
+        $startButton.textContent = 'Stop Timer'
+        timer.startTimer()
     }
+})
+
+$resetButton.addEventListener('click', () => {
+    event.stopPropagation()
+    setDefaults()
 })
 
 function Timer(workTime, restTime) {
 
-    this.running = false;
-    this.isWorkTime = true;
+    this.running = false
+    this.isWorkTime = true
 
     this.stopTimer = () => {
-        this.running = false;
+        this.running = false
         clearInterval(this.interval)
     }
 
     this.startTimer = () => {
 
-        this.running = true;
+        this.running = true
         if (!this.currentTime) {
             this.currentTime = workTime
         }
@@ -46,13 +73,13 @@ function Timer(workTime, restTime) {
                     this.isWorkTime = false
                     this.currentTime = restTime
                     $workTime.textContent = formatTime(workTime)
-                    sendNotification("READY TO WORK")
+                    sendNotification('READY TO REST')
                 }
                 else {
                     this.isWorkTime = true
                     this.currentTime = workTime
                     $restTime.textContent = formatTime(restTime)
-                    sendNotification("READY TO REST")
+                    sendNotification('READY TO WORK')
                 }
                 const audio = new Audio('pomodoro.mp3')
                 audio.loop = false
@@ -84,19 +111,19 @@ function formatTime (time) {
     const minutesStr = Math.floor(time / minutes(1))
     const secondsStr = ((time - (minutesStr * minutes(1))) / seconds(1))
 
-    let formatedString = ""
+    let formatedString = ''
     if (minutesStr === 0) {
-        formatedString += "00"
+        formatedString += '00'
     } else if (minutesStr < 10) {
         formatedString += `0${minutesStr}`
     } else {
         formatedString += minutesStr
     }
 
-    formatedString += ":"
+    formatedString += ':'
 
     if (secondsStr === 0) {
-        formatedString += "00"
+        formatedString += '00'
     } else if (secondsStr < 10) {
         formatedString += `0${secondsStr}`
     } else {
@@ -107,22 +134,117 @@ function formatTime (time) {
 }
 
 function formatedTimeToNumber (formatedTime) {
-    const [formatedMinutes, formatedSeconds] = formatedTime.split(":")
+    const [formatedMinutes, formatedSeconds] = formatedTime.split(':')
     const time = minutes(formatedMinutes) + seconds(formatedSeconds)
     return time
 }
 
 function sendNotification(string) {
-    console.log(Notification.permission)
-    if (Notification.permission === "granted") {
-      new Notification(string);
+    if (Notification.permission === 'granted') {
+        new Notification(string)
     }
-  
-    else if (Notification.permission === "default" || Notification.permission !== 'denied') {
-      Notification.requestPermission().then((permission) => {
-        if (permission === "granted") {
-          new Notification(string);
+
+    else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                new Notification(string)
+            }
+        })
+    }
+}
+
+const $timeUpButtons = document.querySelectorAll('.box-control-up')
+const $timeDownButtons = document.querySelectorAll('.box-control-down')
+
+const timeStep = seconds(30)
+const minimumTime = timeStep
+
+
+$timeUpButtons.forEach(($timeUpButton) => {
+    const $time = $timeUpButton.parentElement.previousElementSibling
+    $timeUpButton.addEventListener('click', () => {
+        const currentTime = formatedTimeToNumber($time.textContent)
+        if (timer && timer.running) {
+            return
         }
-      });
+        const changedTime = currentTime + timeStep
+        $time.textContent = formatTime(changedTime)
+        saveDefaults()
+    })
+})
+
+$timeDownButtons.forEach(($timeDownButton) => {
+    const $time = $timeDownButton.parentElement.previousElementSibling
+    $timeDownButton.addEventListener('click', () => {
+        const currentTime = formatedTimeToNumber($time.textContent)
+        if (currentTime <= minimumTime || timer && timer.running) {
+            return
+        }
+        const changedTime = currentTime - timeStep
+        $time.textContent = formatTime(changedTime)
+        saveDefaults()
+    })
+})
+
+function saveDefaults () {
+    defaultWorkTime = formatedTimeToNumber($workTime.textContent)
+    defaultRestTime = formatedTimeToNumber($restTime.textContent)
+
+    localStorage.setItem('default work time', $workTime.textContent)
+    localStorage.setItem('default rest time', $restTime.textContent)
+}
+
+function setDefaults () {
+    $workTime.textContent = formatTime(defaultWorkTime)
+    $restTime.textContent = formatTime(defaultRestTime)
+}
+
+const $notes = document.querySelector('.notes')
+
+const savedNotes = localStorage.getItem('notes')
+if (savedNotes) {
+    $notes.value = savedNotes
+}
+
+let notesCounter = 1
+let lastNote
+
+$notes.addEventListener('keydown', (event) => {
+    const strings = $notes.value.split('\n')
+
+    if (event.code === 'Backspace') {
+        if ($notes.value) {
+            let lastString = strings.pop()
+            if (lastString.length === 3 || lastString.length === 2) {
+                event.stopPropagation()
+                event.preventDefault()
+                lastString = ''
+                strings.push(lastString)
+                $notes.value = strings.join('\n')
+            }
+        }
     }
-  }
+
+    if (event.code === 'Enter') {
+        event.stopPropagation()
+        event.preventDefault()
+
+        if (!$notes.value) {
+            notesCounter = 0
+        } else {
+            let lastCountedString = strings.pop().split('.').shift()
+
+            if (lastCountedString) {
+                notesCounter = +lastCountedString
+                $notes.value += `\n`
+            }
+    
+            if (!lastCountedString) {
+                lastCountedString = strings[strings.length - 1].split('.').shift()
+                notesCounter = +lastCountedString 
+            }
+        }
+        $notes.value += `${notesCounter += 1}. `
+    }
+    localStorage.setItem('notes', $notes.value)
+})
