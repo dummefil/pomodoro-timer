@@ -244,13 +244,13 @@ $notes.addEventListener('keydown', (event) => {
             let lastCountedString = strings.pop().split('.').shift()
 
             if (lastCountedString) {
-                notesCounter = +lastCountedString
+                notesCounter = +lastCountedString || 0
                 $notes.value += `\n`
             }
     
             if (!lastCountedString) {
                 lastCountedString = strings[strings.length - 1].split('.').shift()
-                notesCounter = +lastCountedString 
+                notesCounter = +lastCountedString || 0
             }
             
         }
