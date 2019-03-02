@@ -215,9 +215,16 @@ $notes.addEventListener('keydown', (event) => {
         $notes.value += `${notesCounter += 1}. `
     }
 
-    if ($notes.value === '') {
+    console.log(event)
+    if (event.code === 'KeyX' && event.ctrlKey === true) {
+    } else if ($notes.selectionStart === 0 && ($notes.value.length === $notes.selectionEnd)) {
+        $notes.value = ''
+        spawnLine(0)
+    } else if ($notes.value === '') {
         spawnLine(0)
     }
+
+    console.log($notes.selectionStart, $notes.selectionEnd, $notes.value.length)
 
     const strings = $notes.value.split('\n')
 
