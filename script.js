@@ -45,7 +45,7 @@ $startButton.addEventListener('click', (event) => {
 
 $resetButton.addEventListener('click', () => {
     event.stopPropagation()
-    setDefaults()
+    if (!timer.running) setDefaults()
 })
 
 function Timer(workTime, restTime) {
@@ -210,6 +210,15 @@ let notesCounter = 1
 let lastNote
 
 $notes.addEventListener('keydown', (event) => {
+
+    function spawnLine (notesCounter) {
+        $notes.value += `${notesCounter += 1}. `
+    }
+
+    if ($notes.value === '') {
+        spawnLine(0)
+    }
+
     const strings = $notes.value.split('\n')
 
     if (event.code === 'Backspace') {
@@ -243,8 +252,9 @@ $notes.addEventListener('keydown', (event) => {
                 lastCountedString = strings[strings.length - 1].split('.').shift()
                 notesCounter = +lastCountedString 
             }
+            
         }
-        $notes.value += `${notesCounter += 1}. `
+        spawnLine(notesCounter)
     }
     localStorage.setItem('notes', $notes.value)
 })

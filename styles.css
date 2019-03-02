@@ -116,16 +116,27 @@ ul li:before {
     width: 100%;
     text-align: center;
     cursor: pointer;
+    position: relative;
 }
 
 .box-control-up:hover, .box-control-down:hover {
     color: black;
 }
 
+.box-control-up {
+    transform: rotate(-90deg);
+    right: 1.5px;
+}
+
+.box-control-down {
+    transform: rotate(90deg);
+}
+
 .box-controls {
     color: #4d5a56;
     margin-left: 10px;
 }
+
 
 .buttons-wrapper {
     display: flex;
